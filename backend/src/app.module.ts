@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { CoachModule } from './coach/coach.module';
 import {ServicesModule} from "./services/services.module";
 import { BlogModule } from './blog/blog.module';
+import {JwtModule} from "@nestjs/jwt";
 
 @Module({
   imports: [
