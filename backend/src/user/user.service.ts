@@ -25,7 +25,6 @@ export class UserService {
         const {email, password} = registerUserDTO
 
         const user = await this.userModel.findOne({ email })
-        const jwtDataUser = new JwtPayloadDataDto(user)
 
         if(user) {
             throw new BadRequestException('Пользователь с такой почтой уже существует.')
@@ -54,7 +53,7 @@ export class UserService {
                 `
         })
 
-        const tokens = await this.getTokens({...jwtDataUser})
+        const tokens = await this.getTokens(newUser._id, newUser.email, newUser.isVerify)
 
         return {
             message: 'Сообщение для активации вашего личного кабинета было отправлено на вашу почту',
@@ -79,8 +78,6 @@ export class UserService {
 
         const user = await this.userModel.findOne({email})
 
-        const jwtDataUser = new JwtPayloadDataDto(user)
-
         if(!user) {
             throw new BadRequestException('Неверный логин')
         }
@@ -96,16 +93,18 @@ export class UserService {
                 message: 'Пожалуйста, подтвердите вашу почту.'
             }
         } else {
-            const tokens = await this.getTokens({...jwtDataUser})
+            const tokens = await this.getTokens(user._id, user.email, user.isVerify)
 
             return {user, ...tokens}
         }
 
     }
 
-    async getTokens(jwtData): Promise<ITokens> {
+    async getTokens(userID, email, isVerify): Promise<ITokens> {
         const jwtPayload = {
-            jwtData
+            userID,
+            email,
+            isVerify
         }
 
         const [accessToken, refreshToken] = await Promise.all([
