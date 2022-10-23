@@ -43,10 +43,8 @@ const AppHeader = () => {
             <LowerHeader>
                 <LowerSection><GiHamburgerMenu /></LowerSection>
                 {
-                    arraySectionName.map(section => (
-                        <>
-                            <LowerSection>{section}</LowerSection>
-                        </>
+                    arraySectionName.map((section: string, index: number) => (
+                        <LowerSection key={index}>{section}</LowerSection>
                     ))
                 }
             </LowerHeader>
