@@ -1,16 +1,13 @@
-import React from 'react';
-import {Outlet} from "react-router-dom";
-import ProfileHeader from "../common/ProfileHeader";
+import ProfileHeader from "../common/profile-header/ProfileHeader";
 
-const ProfileLayout = () => {
+export const ProfileLayout = ({children}: any) => {
     return (
         <>
             <ProfileHeader />
             <div className='content'>
-                <Outlet />
+                {children}
             </div>
         </>
     );
 };
 
-export default ProfileLayout;

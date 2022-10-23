@@ -1,13 +1,11 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import AppHeader from "../common/AppHeader";
+import AppHeader from "../common/app-header/AppHeader";
 
-const AppLayout = () => {
+const AppLayout = ({children}: any) => {
     return (
         <>
             <AppHeader />
             <div className='content'>
-                <Outlet />
+                {children}
             </div>
         </>
     );

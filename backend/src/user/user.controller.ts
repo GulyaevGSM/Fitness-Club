@@ -21,7 +21,7 @@ export class UserController {
 
   @Get('verify/:verifyLink')
   // @Redirect('https://dzen.ru/?yredirect=true')
-  //TODO Need to do redirect to our client app
+  //TODO Need to do redirect to our client root
   async verify(@Param() params: {verifyLink: string}) {
     return await this.userService.verify(params.verifyLink)
   }
