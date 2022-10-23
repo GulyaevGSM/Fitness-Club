@@ -15,8 +15,15 @@ export const useRouter = (auth: boolean) => {
         return createBrowserRouter(createRoutesFromElements(
                 <>
                     <Route path='/' element={<AppLayout />}>
+                        <Route index element={<Home />}/>
+                        <Route path='/blog' element={<Blog />}/>
+                        <Route path='/admin' element={<Admin />}/>
+                    </Route>
+                    <Route path='/login' element={<ProfileLayout />}>
                         <Route index element={<Login />}/>
-                        <Route path='/register' element={<Register />}/>
+                    </Route>
+                    <Route path='/register' element={<ProfileLayout />}>
+                        <Route index element={<Register />}/>
                     </Route>
                     <Route path='/admin' element={<AdminLayout />}>
                         <Route index element={<Admin />}/>
@@ -32,7 +39,9 @@ export const useRouter = (auth: boolean) => {
                 <Route path='/' element={<AppLayout />}>
                     <Route index element={<Home />}/>
                     <Route path='/blog' element={<Blog />}/>
-                    <Route path='/admin' element={<Admin />}/>
+                </Route>
+                <Route path='/admin' element={<AdminLayout />}>
+                    <Route index element={<Admin />}/>
                 </Route>
                 <Route path='/profile' element={<ProfileLayout />}>
                     <Route index element={<Profile />}/>

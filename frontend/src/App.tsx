@@ -4,7 +4,7 @@ import {RouterProvider} from "react-router-dom";
 import {ChakraProvider} from "@chakra-ui/react";
 
 function App() {
-    const router = useRouter(true)
+    const router = useRouter(false)
 
   return (
    <ChakraProvider>

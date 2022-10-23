@@ -6,7 +6,9 @@ const ProfileLayout = () => {
     return (
         <>
             <ProfileHeader />
-            <Outlet />
+            <div className='content'>
+                <Outlet />
+            </div>
         </>
     );
 };

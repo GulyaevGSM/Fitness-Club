@@ -10,7 +10,6 @@ import * as bcrypt from 'bcrypt';
 import * as randomstring from "randomstring";
 import {ITokens} from "./types/jwt.type";
 import {JwtService} from "@nestjs/jwt";
-import {JwtPayloadDataDto} from "./dtos/jwt-payload-data.dto";
 
 @Injectable()
 export class UserService {
