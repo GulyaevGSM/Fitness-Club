@@ -1,16 +1,23 @@
 import React from 'react';
-import { ProfileTitle, ProfileLogo, GlobalProfileTemplate, UpperProfileHeaderTemplate, LowerProfileHeaderTemplate, ProfileSection } from './styles/profile-header.styles';
+import { ProfileTitle, ProfileLogo, GlobalProfileTemplate, UpperProfileHeaderTemplate, LowerProfileHeaderTemplate, ProfileSection } from './styles/profile-header.style';
 import Image from 'next/image'
 import gymProfile from '../../../../public/gym-profile.svg'
+import {useRouter} from "next/router";
 
 const ProfileHeader = () => {
+    const router = useRouter()
 
     const arrayProfileSections = ['Главная', 'Магазин', 'Занятия', 'Профиль']
+
+    const redirectHandler = () => router.push('/')
+
 
     return (
        <GlobalProfileTemplate>
            <UpperProfileHeaderTemplate>
-               <ProfileLogo>
+               <ProfileLogo
+                   onClick={redirectHandler}
+               >
                    <Image src={gymProfile} width={200} height={50}/>
                </ProfileLogo>
                <ProfileTitle>

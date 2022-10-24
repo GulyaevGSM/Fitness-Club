@@ -66,10 +66,12 @@ export const LowerHeader = styled.div`
 `
 
 export const Logo = styled.div`
-    img {
-      width: 198px;
-      height: 56px;
-    }
+  cursor: pointer;
+  
+  img {
+    width: 198px;
+    height: 56px;
+  }
 `
 
 export const CallNumber = styled.div`

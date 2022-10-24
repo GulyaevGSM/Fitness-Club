@@ -1,4 +1,4 @@
-import {BadRequestException, ForbiddenException, Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import { Model } from 'mongoose';
 import {User} from "./models/user.model";
@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import * as randomstring from "randomstring";
 import {ITokens} from "./types/jwt.type";
 import {JwtService} from "@nestjs/jwt";
+import {VerifyLinkDto} from "./dtos/verify-link.dto";
 
 @Injectable()
 export class UserService {
@@ -41,13 +42,13 @@ export class UserService {
         await this.mailerService.sendMail({
             from: process.env.SMTP_USER,
             to: email,
-            subject: 'Активация аккаунта на GulyaevGYM',
+            subject: '[GulyaevGYM] Подтверждение аккаунта',
             text: '',
             html:
                 `
                     <div>
-                        <h1>Для активации личного кабинета перейдите по ссылке ниже</h1>
-                        <a href="${this.configService.get<string>('API_URL')}/api/user/verify/${verifyLink}">${this.configService.get<string>('API_URL')}/api/user/verify/${verifyLink}</a>
+                        <h1>Код подтверждения для регистрации в личном кабинете</h1>
+                        <h3>${verifyLink}</h3>
                     </div>
                 `
         })
@@ -61,15 +62,19 @@ export class UserService {
         }
     }
 
-    async verify(verifyLink: string) {
-        const isUserVerify = await this.userModel.findOne({ verifyLink })
+    async verify(verifyLinkDTO: VerifyLinkDto) {
+        const {verifyLink} = verifyLinkDTO
+        const isVerifyUser = await this.userModel.findOne({ verifyLink })
 
-        if(!isUserVerify) {
-            throw new ForbiddenException('Некорректная ссылка для активации')
+        if(!isVerifyUser) throw new BadRequestException('Неверный код активации')
+
+        isVerifyUser.isVerify = true
+        await isVerifyUser.save()
+
+        return {
+            message: 'Успешная активация!',
+            user: isVerifyUser
         }
-
-        isUserVerify.isVerify = true
-        await isUserVerify.save()
     }
 
     async login(loginUserDTO: LoginUserDto) {

@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import {ValidationPipe} from "@nestjs/common";
 import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
-import {HttpExceptionFilter} from "./filters/http-exception.filter";
+import {HttpExceptionFilter} from "./utils/filters/http-exception.filter";
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3001

@@ -12,7 +12,6 @@ export const UpperProfileHeaderTemplate = styled.div`
   font-size: 18px;
   font-weight: normal;
   display: flex;
-  align-items: center;
 `
 
 export const LowerProfileHeaderTemplate = styled.div`
@@ -24,6 +23,8 @@ export const LowerProfileHeaderTemplate = styled.div`
 
 export const ProfileLogo = styled.div`
   margin: 0 100px 0 200px;
+  display: flex;
+  cursor: pointer;
 `
 
 export const ProfileTitle = styled.div`
