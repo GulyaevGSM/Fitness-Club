@@ -11,6 +11,7 @@ import * as randomstring from "randomstring";
 import {ITokens} from "./types/jwt.type";
 import {JwtService} from "@nestjs/jwt";
 import {VerifyCodeDto} from "./dtos/verify-code.dto";
+import {Request, Response} from "express";
 
 @Injectable()
 export class UserService {
@@ -40,7 +41,7 @@ export class UserService {
         })
 
         await this.mailerService.sendMail({
-            from: process.env.SMTP_USER,
+            from: this.configService.get<string>('SMTP_USER'),
             to: email,
             subject: '[GulyaevGYM] Подтверждение аккаунта',
             text: '',
@@ -53,16 +54,13 @@ export class UserService {
                 `
         })
 
-        const tokens = await this.getTokens(newUser._id, newUser.email, newUser.isVerify)
-
         return {
             message: 'Сообщение для активации вашего личного кабинета было отправлено на вашу почту',
-            user: newUser,
-            ...tokens
+            user: newUser
         }
     }
 
-    async login(loginUserDTO: LoginUserDto) {
+    async login(response: Response, request: Request, loginUserDTO: LoginUserDto) {
         const {email, password} = loginUserDTO
 
         const user = await this.userModel.findOne({email})
@@ -84,6 +82,8 @@ export class UserService {
         } else {
             const tokens = await this.getTokens(user._id, user.email, user.isVerify)
 
+            await response.cookie('accessToken', tokens.accessToken, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+
             return {
                 message: 'Вы вошли в личный кабинет',
                 user,
@@ -92,7 +92,7 @@ export class UserService {
         }
     }
 
-    async verify(verifyCodeDTO: VerifyCodeDto) {
+    async verify(response: Response, request: Request, verifyCodeDTO: VerifyCodeDto) {
         const {verifyCode} = verifyCodeDTO
         const isVerifyUser = await this.userModel.findOne({ verifyCode })
 
@@ -101,9 +101,14 @@ export class UserService {
         isVerifyUser.isVerify = true
         await isVerifyUser.save()
 
+        const tokens = await this.getTokens(isVerifyUser._id, isVerifyUser.email, isVerifyUser.isVerify)
+
+        await response.cookie('accessToken', tokens.accessToken, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+
         return {
             message: 'Успешная активация!',
-            user: isVerifyUser
+            user: isVerifyUser,
+            ...tokens
         }
     }
 

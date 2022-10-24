@@ -20,7 +20,7 @@ import {useRouter} from "next/router";
 import {useForm} from "react-hook-form";
 import {Toaster} from "react-hot-toast";
 import {authNotify} from "../../src/components/toasts/auth.notify";
-import {registerRequest, verifyUserRequest} from "../../src/services/requests/auth.request";
+import {loginRequest, registerRequest, verifyUserRequest} from "../../src/services/requests/auth.request";
 import {completeIcon, errorIcon, processIcon} from "../../src/utils/icons";
 
 const Register = () => {
@@ -69,19 +69,53 @@ const Register = () => {
 
     const sendVerifyCodeHandler = async () => {
         try {
+            if(!isVerifyCode) return
+
             if(isVerifyCode.trim()) {
                 await verifyUserRequest({verifyCode: isVerifyCode.trim()})
                 authNotify(completeIcon, 'Вы успешно подтвердили аккаунт')
-                router.push('/profile')
+                await router.push('/profile')
             } else {
                 authNotify(processIcon, 'Введите код подтверждения')
             }
         } catch (e: any) {
-            authNotify(errorIcon, e.response.data.message)
+            authNotify(errorIcon, e?.response?.data?.message)
         }
     }
 
     const redirectHandler = () => router.push('/login')
+
+    const keyHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if(e.key === 'Enter') {
+            if(form.password !== form.repeatPassword) return authNotify(errorIcon, 'Пароли не совпадают')
+
+            try {
+                await registerRequest({email: form.email, password: form.password})
+                await onOpen()
+                authNotify(processIcon, 'Проверьте вашу почту и введите код подтверждения')
+            } catch (e: any) {
+                authNotify(errorIcon, e?.response?.data?.message)
+            }
+        }
+    }
+
+    const keySendCode = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if(e.key === 'Enter') {
+            try {
+                if(!isVerifyCode) return
+
+                if(isVerifyCode.trim()) {
+                    await verifyUserRequest({verifyCode: isVerifyCode.trim()})
+                    authNotify(completeIcon, 'Вы успешно подтвердили аккаунт')
+                    await router.push('/profile')
+                } else {
+                    authNotify(processIcon, 'Введите код подтверждения')
+                }
+            } catch (e: any) {
+                authNotify(errorIcon, e?.response?.data?.message)
+            }
+        }
+    }
 
     return (
         <RegisterTemplate>
@@ -101,6 +135,7 @@ const Register = () => {
                                 onChange={changeHandlerVerifyCodeInput}
                                 value={isVerifyCode}
                                 placeholder='Введите код'
+                                onKeyPress={keySendCode}
                             />
                         </FormControl>
                     </ModalBody>
@@ -186,6 +221,7 @@ const Register = () => {
                     name='repeatPassword'
                     value={form.repeatPassword}
                     placeholder='Подтверждение пароля'
+                    onKeyPress={keyHandler}
                 />
                 <AcceptInfo>
                     Я ознакомлен с правилами и согласен на обработку персональных данных

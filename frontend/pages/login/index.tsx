@@ -7,7 +7,7 @@ import {useForm} from "react-hook-form";
 import { loginRequest } from '../../src/services/requests/auth.request';
 import { Toaster } from 'react-hot-toast';
 import {authNotify} from "../../src/components/toasts/auth.notify";
-import {errorIcon} from "../../src/utils/icons";
+import {completeIcon, errorIcon} from "../../src/utils/icons";
 
 const Login = () => {
     const [form, setForm] = useState<any>({
@@ -37,9 +37,23 @@ const Login = () => {
     const loginHandler = async () => {
        try {
            await loginRequest({...form})
+           authNotify(completeIcon, 'Вы успешно вошли с систему')
+           await router.push('/profile')
        } catch (e: any) {
            authNotify(errorIcon, e.response.data.message)
        }
+    }
+
+    const keyHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if(e.key === 'Enter') {
+            try {
+                await loginRequest({...form})
+                authNotify(completeIcon, 'Вы успешно вошли с систему')
+                await router.push('/profile')
+            } catch (e: any) {
+                authNotify(errorIcon, e.response.data.message)
+            }
+        }
     }
 
     return (
@@ -83,6 +97,7 @@ const Login = () => {
                     name='password'
                     value={form.password}
                     placeholder='Пароль'
+                    onKeyPress={keyHandler}
                 />
                 <Button
                     onClick={handleSubmit(loginHandler)}
