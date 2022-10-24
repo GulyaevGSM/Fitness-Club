@@ -9,7 +9,7 @@ export const UserModel = new mongoose.Schema({
     patronymic: {type: String},
     dateOfBirth: {type: Date},
     balance: {type: Number, default: 0},
-    verifyLink: {type: String, required: true},
+    verifyCode: {type: String, required: true},
     isVerify: {type: Boolean, default: false}
 })
 
@@ -22,5 +22,6 @@ export interface User extends mongoose.Document {
     surName: string;
     patronymic: string;
     dateOfBirth: Date;
+    verifyCode: string;
     isVerify: boolean;
 }

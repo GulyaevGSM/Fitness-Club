@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import * as randomstring from "randomstring";
 import {ITokens} from "./types/jwt.type";
 import {JwtService} from "@nestjs/jwt";
-import {VerifyLinkDto} from "./dtos/verify-link.dto";
+import {VerifyCodeDto} from "./dtos/verify-code.dto";
 
 @Injectable()
 export class UserService {
@@ -31,12 +31,12 @@ export class UserService {
         }
 
         const hashedPassword = await bcrypt.hash(password, Number(this.configService.get<any>('HASH_SALT')))
-        const verifyLink = randomstring.generate(7);
+        const verifyCode = randomstring.generate(7);
 
         const newUser = await this.userModel.create({
             email,
             password: hashedPassword,
-            verifyLink
+            verifyCode
         })
 
         await this.mailerService.sendMail({
@@ -48,7 +48,7 @@ export class UserService {
                 `
                     <div>
                         <h1>Код подтверждения для регистрации в личном кабинете</h1>
-                        <h3>${verifyLink}</h3>
+                        <h3>${verifyCode}</h3>
                     </div>
                 `
         })
@@ -59,21 +59,6 @@ export class UserService {
             message: 'Сообщение для активации вашего личного кабинета было отправлено на вашу почту',
             user: newUser,
             ...tokens
-        }
-    }
-
-    async verify(verifyLinkDTO: VerifyLinkDto) {
-        const {verifyLink} = verifyLinkDTO
-        const isVerifyUser = await this.userModel.findOne({ verifyLink })
-
-        if(!isVerifyUser) throw new BadRequestException('Неверный код активации')
-
-        isVerifyUser.isVerify = true
-        await isVerifyUser.save()
-
-        return {
-            message: 'Успешная активация!',
-            user: isVerifyUser
         }
     }
 
@@ -99,9 +84,27 @@ export class UserService {
         } else {
             const tokens = await this.getTokens(user._id, user.email, user.isVerify)
 
-            return {user, ...tokens}
+            return {
+                message: 'Вы вошли в личный кабинет',
+                user,
+                ...tokens
+            }
         }
+    }
 
+    async verify(verifyCodeDTO: VerifyCodeDto) {
+        const {verifyCode} = verifyCodeDTO
+        const isVerifyUser = await this.userModel.findOne({ verifyCode })
+
+        if(!isVerifyUser) throw new BadRequestException('Неверный код активации')
+
+        isVerifyUser.isVerify = true
+        await isVerifyUser.save()
+
+        return {
+            message: 'Успешная активация!',
+            user: isVerifyUser
+        }
     }
 
     async getTokens(userID, email, isVerify): Promise<ITokens> {

@@ -2,7 +2,7 @@ import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Redirect} from
 import { UserService } from './user.service';
 import {RegisterUserDto} from "./dtos/register-user.dto";
 import {LoginUserDto} from "./dtos/login-user.dto";
-import {VerifyLinkDto} from "./dtos/verify-link.dto";
+import {VerifyCodeDto} from "./dtos/verify-code.dto";
 
 @Controller('user')
 export class UserController {
@@ -23,8 +23,8 @@ export class UserController {
   @Post('verify')
   // @Redirect('https://dzen.ru/?yredirect=true')
   //TODO Need to do redirect to our client root
-  async verify(@Body() verifyLinkDTO: VerifyLinkDto) {
-    return await this.userService.verify(verifyLinkDTO)
+  async verify(@Body() verifyCodeDTO: VerifyCodeDto) {
+    return await this.userService.verify(verifyCodeDTO)
   }
 
   @Get('test')
