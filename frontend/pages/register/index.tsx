@@ -23,7 +23,7 @@ import {authNotify} from "../../src/components/toasts/auth.notify";
 import {verifyUserRequest} from "../../src/services/requests/auth.request";
 import {completeIcon, errorIcon, processIcon} from "../../src/utils/icons";
 import {useAppDispatch, useAppSelector} from "../../src/services/redux/hooks";
-import {authRegister} from "../../src/services/redux/slices/auth.slice";
+import {authRegister, authVerify} from "../../src/services/redux/slices/auth.slice";
 import { Triangle } from  'react-loader-spinner'
 import {unwrapResult} from "@reduxjs/toolkit";
 
@@ -83,7 +83,8 @@ const Register = () => {
             if(!isVerifyCode) return
 
             if(isVerifyCode.trim()) {
-                await verifyUserRequest({verifyCode: isVerifyCode.trim()})
+                const resAction = await dispatch(authVerify({verifyCode: isVerifyCode.trim()}))
+                unwrapResult(resAction)
                 authNotify(completeIcon, 'Вы успешно подтвердили аккаунт')
                 await router.push('/profile')
             } else {
@@ -120,7 +121,9 @@ const Register = () => {
                 if(!isVerifyCode) return
 
                 if(isVerifyCode.trim()) {
-                    await verifyUserRequest({verifyCode: isVerifyCode.trim()})
+                    // await verifyUserRequest({verifyCode: isVerifyCode.trim()})
+                    const resAction = await dispatch(authVerify({verifyCode: isVerifyCode.trim()}))
+                    unwrapResult(resAction)
                     authNotify(completeIcon, 'Вы успешно подтвердили аккаунт')
                     await router.push('/profile')
                 } else {

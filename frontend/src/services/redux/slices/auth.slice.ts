@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {axiosInstance} from "../../requests/instance/axios.instance";
-import {IAuthState, IRegisterAuthData, TAuthLogin, TAuthRegister} from "../../types/auth.type";
+import {IAuthState, IRegisterAuthData, TAuthLogin, TAuthRegister, TAuthVerifyCode} from "../../types/auth.type";
 
 const initialState: IAuthState = {
     loading: false,
@@ -35,12 +35,19 @@ export const authLogin = createAsyncThunk(
     }
 );
 
-//const verifyUserRequest = async (data: TAuthVerifyCode) => {
-//     const res = await axiosInstance.post('/api/user/verify', data)
-//
-//     console.log('Verify Request Data => ', res)
-//     return res.data
-// }
+export const authVerify = createAsyncThunk(
+    'auth/authVerify',
+    async function(data: TAuthVerifyCode, {rejectWithValue}) {
+        try {
+            const res = await axiosInstance.post<TAuthVerifyCode>('/api/user/verify', data)
+
+            console.log('Verify Request Data => ', res)
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e)
+        }
+    }
+)
 
 const AuthSlice = createSlice({
     name: 'auth',
@@ -70,6 +77,18 @@ const AuthSlice = createSlice({
             state.error = null
         },
         [authLogin.rejected.type]: (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        },
+        [authVerify.pending.type]: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        [authVerify.fulfilled.type]: (state) => {
+            state.loading = false
+            state.error = null
+        },
+        [authVerify.rejected.type]: (state, action) => {
             state.loading = false
             state.error = action.payload
         }

@@ -31,7 +31,9 @@ export class UserService {
 
         if(user && user.isVerify) {
             throw new BadRequestException('Пользователь с такой почтой уже существует.')
-        } else {
+        }
+
+        if(user && !user.isVerify) {
             throw new BadRequestException({
                 message: 'Введите код подтверждения, который был выслан на вашу почту при регистрации',
                 needToVerify: true
@@ -142,8 +144,13 @@ export class UserService {
         }
     }
 
-    async logout(response: Response) {
-
+    async logout(response: Response, request: Request) {
+        //Нужно будет дописать логику
+        // const {refreshToken} = request.cookies
+        // if(refreshToken) {
+        //     response.clearCookie('refreshToken')
+        // }
+        response.clearCookie('refreshToken')
     }
 
     async test() {

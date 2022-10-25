@@ -30,8 +30,8 @@ export class UserController {
   }
 
   @Get('logout')
-  async logout(@Res({passthrough: true}) response: Response) {
-    return this.userService.logout(response)
+  async logout(@Res({passthrough: true}) response: Response, @Req() request: Request) {
+    return this.userService.logout(response, request)
   }
 
   @UseGuards(AuthGuard('jwt-access'))
