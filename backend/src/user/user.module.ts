@@ -8,11 +8,13 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
 import {JwtModule} from "@nestjs/jwt";
 import {AccessStrategy} from "./strategies/access.strategy";
 import {RefreshStrategy} from "./strategies/refresh.strategy";
+import {TokenModel} from "./models/token.model";
 
 @Module({
   imports: [
       JwtModule.register({}),
       MongooseModule.forFeature([{name: 'User', schema: UserModel}]),
+      MongooseModule.forFeature([{name: 'Token', schema: TokenModel}]),
       MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],

@@ -13,6 +13,7 @@ import {JwtModule} from "@nestjs/jwt";
       CoachModule,
       ServicesModule,
       BlogModule,
+      JwtModule.register({}),
       ConfigModule.forRoot({
         envFilePath: '.env',
         isGlobal: true

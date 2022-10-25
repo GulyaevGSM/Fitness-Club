@@ -12,11 +12,13 @@ import {ITokens} from "./types/jwt.type";
 import {JwtService} from "@nestjs/jwt";
 import {VerifyCodeDto} from "./dtos/verify-code.dto";
 import {Request, Response} from "express";
+import {Token} from "./models/token.model";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>,
+        @InjectModel('Token') private readonly tokenModel: Model<Token>,
         private readonly mailerService: MailerService,
         private readonly configService: ConfigService,
         private jwtService: JwtService,
@@ -27,8 +29,13 @@ export class UserService {
 
         const user = await this.userModel.findOne({ email })
 
-        if(user) {
+        if(user && user.isVerify) {
             throw new BadRequestException('Пользователь с такой почтой уже существует.')
+        } else {
+            throw new BadRequestException({
+                message: 'Введите код подтверждения, который был выслан на вашу почту при регистрации',
+                needToVerify: true
+            })
         }
 
         const hashedPassword = await bcrypt.hash(password, Number(this.configService.get<any>('HASH_SALT')))
@@ -76,13 +83,12 @@ export class UserService {
         }
 
         if(!user.isVerify) {
-            return {
-                message: 'Пожалуйста, подтвердите вашу почту.'
-            }
+            throw new BadRequestException({message: 'Пожалуйста, подтвердите вашу почту.', isVerify: false  })
         } else {
             const tokens = await this.getTokens(user._id, user.email, user.isVerify)
 
-            await response.cookie('accessToken', tokens.accessToken, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+            await response.cookie('refreshToken', tokens.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+            //expiresIn = 1 month
 
             return {
                 message: 'Вы вошли в личный кабинет',
@@ -103,7 +109,7 @@ export class UserService {
 
         const tokens = await this.getTokens(isVerifyUser._id, isVerifyUser.email, isVerifyUser.isVerify)
 
-        await response.cookie('accessToken', tokens.accessToken, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+        await response.cookie('refreshToken', tokens.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
 
         return {
             message: 'Успешная активация!',
@@ -122,7 +128,7 @@ export class UserService {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(jwtPayload, {
                 secret: this.configService.get<string>('ACCESS_SECRET'),
-                expiresIn: '20s'
+                expiresIn: '2h'
             }),
             this.jwtService.signAsync(jwtPayload, {
                 secret: this.configService.get<string>('REFRESH_SECRET'),
@@ -136,7 +142,11 @@ export class UserService {
         }
     }
 
-    async test() {
+    async logout(response: Response) {
 
+    }
+
+    async test() {
+        return 'test'
     }
 }

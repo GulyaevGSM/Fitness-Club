@@ -13,20 +13,27 @@ import {
     ModalOverlay,
     useDisclosure
 } from "@chakra-ui/react";
-import {AcceptInfo, InputWithInfo, RegisterForm, RegisterTitle } from './styles/register.styles';
-import { RegisterTemplate } from './styles/register.styles';
-import { ToRegisterPage } from '../login/styles/login.style';
+import {AcceptInfo, InputWithInfo, PreloaderOverflow, RegisterForm, RegisterTitle } from './styles/register.style';
+import { RegisterTemplate } from './styles/register.style';
+import { ToLoginPage } from '../register/styles/register.style';
 import {useRouter} from "next/router";
 import {useForm} from "react-hook-form";
 import {Toaster} from "react-hot-toast";
 import {authNotify} from "../../src/components/toasts/auth.notify";
-import {loginRequest, registerRequest, verifyUserRequest} from "../../src/services/requests/auth.request";
+import {verifyUserRequest} from "../../src/services/requests/auth.request";
 import {completeIcon, errorIcon, processIcon} from "../../src/utils/icons";
+import {useAppDispatch, useAppSelector} from "../../src/services/redux/hooks";
+import {authRegister} from "../../src/services/redux/slices/auth.slice";
+import { Triangle } from  'react-loader-spinner'
+import {unwrapResult} from "@reduxjs/toolkit";
 
 const Register = () => {
     const router = useRouter()
 
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const dispatch = useAppDispatch()
+
+    const {loading, error} = useAppSelector(state => state.AuthReducer)
 
     const [form, setForm] = useState<any>({
         email: '',
@@ -59,10 +66,14 @@ const Register = () => {
         if(form.password !== form.repeatPassword) return authNotify(errorIcon, 'Пароли не совпадают')
 
         try {
-            await registerRequest({email: form.email, password: form.password})
+            const resAction = await dispatch(authRegister({email: form.email, password: form.password}))
+            unwrapResult(resAction)
             await onOpen()
             authNotify(processIcon, 'Проверьте вашу почту и введите код подтверждения')
         } catch (e: any) {
+            if(e?.response?.data?.needToVerify) {
+                await onOpen()
+            }
             authNotify(errorIcon, e?.response?.data?.message)
         }
     }
@@ -90,10 +101,14 @@ const Register = () => {
             if(form.password !== form.repeatPassword) return authNotify(errorIcon, 'Пароли не совпадают')
 
             try {
-                await registerRequest({email: form.email, password: form.password})
+                const resAction = await dispatch(authRegister({email: form.email, password: form.password}))
+                unwrapResult(resAction)
                 await onOpen()
                 authNotify(processIcon, 'Проверьте вашу почту и введите код подтверждения')
             } catch (e: any) {
+                if(e?.response?.data?.needToVerify) {
+                    await onOpen()
+                }
                 authNotify(errorIcon, e?.response?.data?.message)
             }
         }
@@ -119,6 +134,21 @@ const Register = () => {
 
     return (
         <RegisterTemplate>
+            {
+                loading && (
+                    <PreloaderOverflow>
+                        <Triangle
+                            height="100"
+                            width="100"
+                            color="#968057"
+                            ariaLabel="triangle-loading"
+                            wrapperStyle={{}}
+                            visible={true}
+                        />
+                    </PreloaderOverflow>
+                )
+            }
+
             <Modal
                 closeOnOverlayClick={false}
                 closeOnEsc={false}
@@ -229,7 +259,7 @@ const Register = () => {
                 <Button
                     onClick={handleSubmit(registerHandler)}
                 >Зарегистрироваться</Button>
-                <ToRegisterPage>Если у вас уже есть аккаунт, вы можете <span onClick={redirectHandler}>войти в личный кабинет</span></ToRegisterPage>
+                <ToLoginPage>Если у вас уже есть аккаунт, вы можете <span onClick={redirectHandler}>войти в личный кабинет</span></ToLoginPage>
             </RegisterForm>
         </RegisterTemplate>
     );

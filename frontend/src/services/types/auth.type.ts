@@ -35,3 +35,8 @@ export interface IRegisterAuthData {
     message: string;
     user: TUserData;
 }
+
+export interface IAuthState {
+    loading: boolean;
+    error: any;
+}

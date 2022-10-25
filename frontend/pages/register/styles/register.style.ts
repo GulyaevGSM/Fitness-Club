@@ -74,3 +74,18 @@ export const ToLoginPage = styled.div`
     }
   }
 `
+
+export const PreloaderOverflow = styled.div`
+  background-color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  opacity: 0.7;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+`

@@ -1,9 +1,10 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards} from '@nestjs/common';
 import { UserService } from './user.service';
 import {RegisterUserDto} from "./dtos/register-user.dto";
 import {LoginUserDto} from "./dtos/login-user.dto";
 import {VerifyCodeDto} from "./dtos/verify-code.dto";
 import {Request, Response} from "express";
+import {AuthGuard} from "@nestjs/passport";
 
 @Controller('user')
 export class UserController {
@@ -28,6 +29,12 @@ export class UserController {
     return await this.userService.verify(response, request, verifyCodeDTO)
   }
 
+  @Get('logout')
+  async logout(@Res({passthrough: true}) response: Response) {
+    return this.userService.logout(response)
+  }
+
+  @UseGuards(AuthGuard('jwt-access'))
   @Get('test')
   async test() {
     return await this.userService.test()
