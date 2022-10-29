@@ -5,6 +5,7 @@ import {LoginUserDto} from "./dtos/login-user.dto";
 import {VerifyCodeDto} from "./dtos/verify-code.dto";
 import {Request, Response} from "express";
 import {AuthGuard} from "@nestjs/passport";
+import {GetCurrentUserId} from "./common/decorators/get-current-user-id.decorator";
 
 @Controller('user')
 export class UserController {
@@ -29,12 +30,18 @@ export class UserController {
     return await this.userService.verify(response, request, verifyCodeDTO)
   }
 
+  @Get('check')
+  // @UseGuards(AuthGuard('jwt-access'))
+  async checkToken(@Req() request: Request, @Res({passthrough: true}) response: Response) {
+    return await this.userService.checkToken(request, response)
+  }
+
   @Get('logout')
   async logout(@Res({passthrough: true}) response: Response, @Req() request: Request) {
     return this.userService.logout(response, request)
   }
 
-  @UseGuards(AuthGuard('jwt-access'))
+  // `@UseGuards(AuthGuard('jwt-access'))`
   @Get('test')
   async test() {
     return await this.userService.test()

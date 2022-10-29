@@ -238,6 +238,7 @@ const Register = () => {
                     name='password'
                     value={form.password}
                     placeholder='Пароль'
+                    type='password'
                 />
                 <Input
                     style={{
@@ -255,6 +256,7 @@ const Register = () => {
                     value={form.repeatPassword}
                     placeholder='Подтверждение пароля'
                     onKeyPress={keyHandler}
+                    type='password'
                 />
                 <AcceptInfo>
                     Я ознакомлен с правилами и согласен на обработку персональных данных

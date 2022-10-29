@@ -18,3 +18,11 @@ Profile.getLayout = function getLayout(page: ReactNode) {
         </ProfileLayout>
     )
 }
+
+// export const getServerSideProps = async (ctx: any) => {
+//     try {
+//
+//     } catch (e) {
+//         console.log(e)
+//     }
+// }

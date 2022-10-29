@@ -10,7 +10,7 @@ import {func} from "prop-types";
 export const NotFoundTemplate = styled.div`
   width: 100vw;
   height: 100vh;
-  background-color: #313030;
+  background-color: #7c7a7a;
   display: flex;
   justify-content: center;
   align-items: center;

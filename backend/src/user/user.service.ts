@@ -13,6 +13,7 @@ import {JwtService} from "@nestjs/jwt";
 import {VerifyCodeDto} from "./dtos/verify-code.dto";
 import {Request, Response} from "express";
 import {Token} from "./models/token.model";
+import {GetCurrentUserId} from "./common/decorators/get-current-user-id.decorator";
 
 @Injectable()
 export class UserService {
@@ -89,7 +90,7 @@ export class UserService {
         } else {
             const tokens = await this.getTokens(user._id, user.email, user.isVerify)
 
-            await response.cookie('refreshToken', tokens.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+            await response.cookie('accessToken', tokens.accessToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
             //expiresIn = 1 month
 
             return {
@@ -111,13 +112,33 @@ export class UserService {
 
         const tokens = await this.getTokens(isVerifyUser._id, isVerifyUser.email, isVerifyUser.isVerify)
 
-        await response.cookie('refreshToken', tokens.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+        await response.cookie('accessToken', tokens.accessToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
 
         return {
             message: 'Успешная активация!',
             user: isVerifyUser,
             ...tokens
         }
+    }
+
+    async checkToken(request: Request, response: Response) {
+        const {accessToken} = request.cookies
+        if(accessToken) {
+            const decode = await this.jwtService.verify(accessToken, {
+                secret: this.configService.get('ACCESS_SECRET')
+            })
+
+            return {
+                user: decode,
+                accessToken
+            }
+        }
+
+        return
+    }
+
+    async checkUserData() {
+
     }
 
     async getTokens(userID, email, isVerify): Promise<ITokens> {
@@ -130,7 +151,7 @@ export class UserService {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(jwtPayload, {
                 secret: this.configService.get<string>('ACCESS_SECRET'),
-                expiresIn: '2h'
+                expiresIn: '1d'
             }),
             this.jwtService.signAsync(jwtPayload, {
                 secret: this.configService.get<string>('REFRESH_SECRET'),
@@ -145,12 +166,12 @@ export class UserService {
     }
 
     async logout(response: Response, request: Request) {
-        //Нужно будет дописать логику
-        // const {refreshToken} = request.cookies
-        // if(refreshToken) {
-        //     response.clearCookie('refreshToken')
-        // }
-        response.clearCookie('refreshToken')
+        // Нужно будет дописать логику
+        const {accessToken} = request.cookies
+
+        if(accessToken) {
+            response.clearCookie('accessToken')
+        }
     }
 
     async test() {

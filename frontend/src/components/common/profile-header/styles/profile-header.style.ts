@@ -12,6 +12,8 @@ export const UpperProfileHeaderTemplate = styled.div`
   font-size: 18px;
   font-weight: normal;
   display: flex;
+  justify-content: space-around;
+  align-items: center;
 `
 
 export const LowerProfileHeaderTemplate = styled.div`
@@ -19,6 +21,10 @@ export const LowerProfileHeaderTemplate = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`
+
+export const LogoBlock = styled.div`
+  display: flex;
 `
 
 export const ProfileLogo = styled.div`
@@ -41,5 +47,13 @@ export const ProfileSection = styled.div`
   &:hover {
     color: #968057;
     cursor: pointer;
+  }
+`
+
+export const ProfileLogout = styled.div`
+  cursor: pointer;
+
+  &:hover {
+    color: #7c7979;
   }
 `

@@ -19,10 +19,10 @@ import { Toaster } from 'react-hot-toast';
 import {authNotify} from "../../src/components/toasts/auth.notify";
 import {completeIcon, errorIcon, processIcon} from "../../src/utils/icons";
 import {unwrapResult} from "@reduxjs/toolkit";
-import {authLogin} from "../../src/services/redux/slices/auth.slice";
 import {useAppDispatch, useAppSelector} from "../../src/services/redux/hooks";
 import {PreloaderOverflow} from "../register/styles/register.style";
 import {Triangle} from "react-loader-spinner";
+import {addUser, userLogin} from "../../src/services/redux/slices/user.slice";
 
 const Login = () => {
     const [form, setForm] = useState<any>({
@@ -57,7 +57,7 @@ const Login = () => {
 
     const loginHandler = async () => {
        try {
-           const resAction = await dispatch(authLogin({email: form.email, password: form.password}))
+           const resAction = await dispatch(userLogin({email: form.email, password: form.password}))
            unwrapResult(resAction)
            authNotify(completeIcon, 'Вы успешно вошли с систему')
            await router.push('/profile')
@@ -74,12 +74,12 @@ const Login = () => {
     const keyHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key === 'Enter') {
             try {
-                const resAction = await dispatch(authLogin({email: form.email, password: form.password}))
+                const resAction = await dispatch(userLogin({email: form.email, password: form.password}))
                 unwrapResult(resAction)
                 authNotify(completeIcon, 'Вы успешно вошли с систему')
                 await router.push('/profile')
             } catch (e: any) {
-                if(e.response.data.isVerify === false) {
+                if(e?.response?.data?.isVerify === false) {
                     await onOpen()
                     authNotify(processIcon, e.response.data.message)
                     return
@@ -226,6 +226,7 @@ const Login = () => {
                     value={form.password}
                     placeholder='Пароль'
                     onKeyPress={keyHandler}
+                    type='password'
                 />
                 <Button
                     onClick={handleSubmit(loginHandler)}

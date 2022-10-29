@@ -28,6 +28,7 @@ interface IDataLogin {
 }
 
 export interface ILoginAuthData {
+    message?: string;
     data: IDataLogin
 }
 

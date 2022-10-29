@@ -8,9 +8,11 @@ import {AppHeaderTemplate, CallNumber, InputBlock, LogIn, Logo, LowerSection, Lo
 import gymLogo from '../../../../public/gym-logo.svg'
 import Image from 'next/image'
 import {useRouter} from "next/router";
+import {useAppSelector} from "../../../services/redux/hooks";
 
 const AppHeader = () => {
     const router = useRouter()
+    const {user} = useAppSelector(state => state.UserReducer)
 
     const arraySectionName = ['Виды карт', 'Наши тренера', 'Блог', 'О нас', 'Контакты']
 
@@ -36,11 +38,11 @@ const AppHeader = () => {
                     <span>Заказать звонок</span>
                 </CallNumber>
                 <LogIn>
-                    <div>
+                    <div onClick={() => router.push(user ? '/profile' : '/login')}>
                         <a><BsFillPersonFill size={18}/></a>
                         <span>Вход</span>
                     </div>
-                    <div>Личный кабинет</div>
+                    <div onClick={() => router.push(user ? '/profile' : '/login')}>Личный кабинет</div>
                 </LogIn>
                 <Button>Оставить заявку</Button>
             </UpperHeader>

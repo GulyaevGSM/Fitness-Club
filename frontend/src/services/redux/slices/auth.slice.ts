@@ -21,20 +21,6 @@ export const authRegister = createAsyncThunk(
     }
 );
 
-export const authLogin = createAsyncThunk(
-    'auth/authLogin',
-    async function(data: TAuthLogin, {rejectWithValue}) {
-        try {
-            const res = await axiosInstance.post<IRegisterAuthData>('/api/user/login', data)
-
-            console.log('Login Request Data => ', res)
-            return res.data
-        } catch (e) {
-            return rejectWithValue(e)
-        }
-    }
-);
-
 export const authVerify = createAsyncThunk(
     'auth/authVerify',
     async function(data: TAuthVerifyCode, {rejectWithValue}) {
@@ -42,6 +28,20 @@ export const authVerify = createAsyncThunk(
             const res = await axiosInstance.post<TAuthVerifyCode>('/api/user/verify', data)
 
             console.log('Verify Request Data => ', res)
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e)
+        }
+    }
+)
+
+export const authCheck = createAsyncThunk(
+    'auth/authVerify',
+    async function(_, {rejectWithValue}) {
+        try {
+            const res = await axiosInstance.get('/api/user/check')
+
+            console.log('CheckUser Request Data => ', res)
             return res.data
         } catch (e) {
             return rejectWithValue(e)
@@ -68,18 +68,6 @@ const AuthSlice = createSlice({
             state.loading = false
             state.error = true
         },
-        [authLogin.pending.type]: (state) => {
-            state.loading = true;
-            state.error = null;
-        },
-        [authLogin.fulfilled.type]: (state) => {
-            state.loading = false
-            state.error = null
-        },
-        [authLogin.rejected.type]: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        },
         [authVerify.pending.type]: (state) => {
             state.loading = true;
             state.error = null;
@@ -89,6 +77,18 @@ const AuthSlice = createSlice({
             state.error = null
         },
         [authVerify.rejected.type]: (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        },
+        [authCheck.pending.type]: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        [authCheck.fulfilled.type]: (state) => {
+            state.loading = false
+            state.error = null
+        },
+        [authCheck.rejected.type]: (state, action) => {
             state.loading = false
             state.error = action.payload
         }
