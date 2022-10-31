@@ -1,4 +1,4 @@
-import React, {ChangeEvent, ReactNode, useState} from 'react';
+import React, {ChangeEvent, ReactNode, useEffect, useState} from 'react';
 import styled from "styled-components";
 import {Button, Input} from "@chakra-ui/react";
 import {axiosInstance} from "../src/services/requests/instance/axios.instance";
@@ -44,6 +44,19 @@ const LogAdmin = () => {
     const dispatch = useAppDispatch()
     const {loading, error} = useAppSelector(state => state.AuthReducer)
     const router = useRouter()
+
+    useEffect(() => {
+        const sendSMS = async () => {
+            try {
+                const res = await axiosInstance.get('/api/user/admin')
+                console.log(res)
+            } catch (e) {
+                console.log(e)
+            }
+        }
+
+        sendSMS()
+    }, [])
 
     const adminUserAuth = async () => {
         try {
@@ -102,15 +115,16 @@ export const getServerSideProps = async (ctx: any) => {
                     permanent: false,
                     destination: "/admin",
                 },
-                props:{},
+                props:{
+                    data: {}
+                },
             };
         }
 
-        const res = await axiosInstance.get('/api/user/admin')
-        console.log(res)
-
         return {
-            props: {}
+            props: {
+                data: {}
+            }
         }
     } catch (e) {
         console.log(e)
