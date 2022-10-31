@@ -1,4 +1,4 @@
-import React, {ChangeEvent, ReactNode, useEffect, useState} from 'react';
+import React, {ChangeEvent, ReactNode, useState} from 'react';
 import styled from "styled-components";
 import {Button, Input} from "@chakra-ui/react";
 import {axiosInstance} from "../src/services/requests/instance/axios.instance";
@@ -6,6 +6,9 @@ import {useAppDispatch, useAppSelector} from "../src/services/redux/hooks";
 import {unwrapResult} from "@reduxjs/toolkit";
 import {authAdmin} from "../src/services/redux/slices/auth.slice";
 import {useRouter} from "next/router";
+import {authNotify} from "../src/components/toasts/auth.notify";
+import {errorIcon} from "../src/utils/icons";
+import {Toaster} from "react-hot-toast";
 
 export const LogAdminTemplate = styled.div`
   display: flex;
@@ -45,26 +48,13 @@ const LogAdmin = () => {
     const {loading, error} = useAppSelector(state => state.AuthReducer)
     const router = useRouter()
 
-    useEffect(() => {
-        const sendSMS = async () => {
-            try {
-                const res = await axiosInstance.get('/api/user/admin')
-                console.log(res)
-            } catch (e) {
-                console.log(e)
-            }
-        }
-
-        sendSMS()
-    }, [])
-
     const adminUserAuth = async () => {
         try {
             const resAction = await dispatch(authAdmin(adminCode))
             unwrapResult(resAction)
             await router.push('/admin')
-       } catch (e) {
-            console.log(e)
+       } catch (e: any) {
+            authNotify(errorIcon, e.response.data.message)
         }
     }
 
@@ -74,6 +64,10 @@ const LogAdmin = () => {
 
     return (
         <LogAdminTemplate>
+            <Toaster
+                position="bottom-center"
+                reverseOrder={false}
+            />
                 <LogAdminTitle>
                     Вход в Админ Панель
                 </LogAdminTitle>
@@ -115,16 +109,15 @@ export const getServerSideProps = async (ctx: any) => {
                     permanent: false,
                     destination: "/admin",
                 },
-                props:{
-                    data: {}
-                },
+                props:{},
             };
         }
 
+        const res = await axiosInstance.get('/api/user/admin')
+        console.log(res)
+
         return {
-            props: {
-                data: {}
-            }
+            props: {}
         }
     } catch (e) {
         console.log(e)
