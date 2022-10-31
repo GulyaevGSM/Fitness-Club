@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable, Req, Res, Session} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import { Model } from 'mongoose';
 import {User} from "./models/user.model";
@@ -12,18 +12,33 @@ import {ITokens} from "./types/jwt.type";
 import {JwtService} from "@nestjs/jwt";
 import {VerifyCodeDto} from "./dtos/verify-code.dto";
 import {Request, Response} from "express";
-import {Token} from "./models/token.model";
-import {GetCurrentUserId} from "./common/decorators/get-current-user-id.decorator";
+import {ConfirmDataDto} from "./dtos/confirm-data.dto";
+import {ChangePasswordDto} from "./dtos/change-password.dto";
+import {TwilioService} from "nestjs-twilio";
+import {Admin} from "./models/admin.model";
+import {AdminCodeDto} from "./dtos/admin-code.dto";
+import {find} from "rxjs";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>,
-        @InjectModel('Token') private readonly tokenModel: Model<Token>,
+        @InjectModel('Admin') private readonly adminModel: Model<Admin>,
         private readonly mailerService: MailerService,
         private readonly configService: ConfigService,
+        private readonly twilioService: TwilioService,
         private jwtService: JwtService,
 ) {}
+
+    async getUser(userID: string) {
+        const user = await this.userModel.findById(userID)
+
+        if(!user) {
+            throw new BadRequestException('Недействительный пользователь')
+        }
+
+        return user
+    }
 
     async register(registerUserDTO: RegisterUserDto) {
         const {email, password} = registerUserDTO
@@ -137,8 +152,62 @@ export class UserService {
         return
     }
 
-    async checkUserData() {
+    async checkUserData(userID: string) {
+        //TODO дописать логику
+        const user = await this.userModel.findById(userID)
 
+        if(!user.name || !user.surName || !user.patronymic) {
+            return {
+                success: false
+            }
+        }
+
+        return {
+            success: true
+        }
+    }
+
+    async confirmUserData(confirmDataDTO: ConfirmDataDto, userID: string) {
+        const {name, surName, patronymic, dateOfBirth} = confirmDataDTO
+
+        const user = await this.userModel.findByIdAndUpdate(userID, {
+            surName,
+            name,
+            patronymic,
+            dateOfBirth
+        })
+
+        if(!user) {
+            throw new BadRequestException('Ошибка подтверждения данных')
+        }
+
+        return user
+    }
+
+    async changePassword(changePasswordDTO: ChangePasswordDto, userID: string) {
+        const {password, oldPassword} = changePasswordDTO
+
+        const oldPasswordUser = await this.userModel.findById(userID)
+
+        if(!oldPasswordUser) {
+            throw new BadRequestException('Ошибка изменения пароля')
+        }
+
+        const unhashedOldPassword = await bcrypt.compare(oldPassword, oldPasswordUser.password)
+
+        if(!unhashedOldPassword) {
+            throw new BadRequestException('Неверный пароль')
+        }
+
+        const hashedNewPassword = await bcrypt.hash(password, Number(this.configService.get<any>('HASH_SALT')))
+
+        oldPasswordUser.password = hashedNewPassword
+        await oldPasswordUser.save()
+
+        return {
+            message: 'Пароль изменен',
+            user: oldPasswordUser
+        }
     }
 
     async getTokens(userID, email, isVerify): Promise<ITokens> {
@@ -172,6 +241,39 @@ export class UserService {
         if(accessToken) {
             response.clearCookie('accessToken')
         }
+    }
+
+    async admin() {
+        const adminCode = await randomstring.generate(5)
+        const sendSMS = await this.twilioService.client.messages.create({
+            body: `Код для входа в админку: ${adminCode}`,
+            from: '+18583305780',
+            to: '+79788768325',
+        })
+
+        await this.adminModel.deleteMany()
+
+        if(!sendSMS) throw new BadRequestException('Ошибка админ запроса')
+
+        const adminModel = await this.adminModel.create({adminCode})
+
+        return {
+            admin: adminModel,
+            sms: sendSMS
+        }
+    }
+
+    async logAdmin(response: Response, adminCodeDTO: AdminCodeDto) {
+        const {adminCode} = adminCodeDTO
+        const findAdminCode = await this.adminModel.findOne({ adminCode })
+
+        if(!findAdminCode) {
+            throw new BadRequestException('Неверный код для входа в админ панель')
+        }
+
+        await response.cookie('adminCookie', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true })
+
+        return {admin: findAdminCode}
     }
 
     async test() {

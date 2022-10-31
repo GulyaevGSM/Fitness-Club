@@ -6,12 +6,21 @@ import {VerifyCodeDto} from "./dtos/verify-code.dto";
 import {Request, Response} from "express";
 import {AuthGuard} from "@nestjs/passport";
 import {GetCurrentUserId} from "./common/decorators/get-current-user-id.decorator";
+import {ConfirmDataDto} from "./dtos/confirm-data.dto";
+import {ChangePasswordDto} from "./dtos/change-password.dto";
+import {AdminCodeDto} from "./dtos/admin-code.dto";
 
 @Controller('user')
 export class UserController {
   constructor(
       private readonly userService: UserService,
   ) {}
+
+  @Get('getuser')
+  @UseGuards(AuthGuard('jwt-access'))
+  async getUser(@GetCurrentUserId() userID: string) {
+    return await this.userService.getUser(userID)
+  }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -36,9 +45,37 @@ export class UserController {
     return await this.userService.checkToken(request, response)
   }
 
+  @Get('checkdata')
+  @UseGuards(AuthGuard('jwt-access'))
+  async checkUserData(@GetCurrentUserId() userID: string) {
+    return await this.userService.checkUserData(userID)
+  }
+
+  @Post('confirmdata')
+  @UseGuards(AuthGuard('jwt-access'))
+  async confirmUserData(@Body() confirmDataDTO: ConfirmDataDto, @GetCurrentUserId() userID: string) {
+    return await this.userService.confirmUserData(confirmDataDTO, userID)
+  }
+
+  @Post('changepassword')
+  @UseGuards(AuthGuard('jwt-access'))
+  async changePassword(@Body() changePasswordDTO: ChangePasswordDto, @GetCurrentUserId() userID: string) {
+    return await this.userService.changePassword(changePasswordDTO, userID)
+  }
+
   @Get('logout')
   async logout(@Res({passthrough: true}) response: Response, @Req() request: Request) {
     return this.userService.logout(response, request)
+  }
+
+  @Get('admin')
+  async admin(@Res({passthrough: true}) response) {
+    return await this.userService.admin()
+  }
+
+  @Post('logadmin')
+  async logAdmin(@Res({passthrough: true}) response, @Body() adminCodeDTO: AdminCodeDto) {
+    return await this.userService.logAdmin(response, adminCodeDTO)
   }
 
   // `@UseGuards(AuthGuard('jwt-access'))`

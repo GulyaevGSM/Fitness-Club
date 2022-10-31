@@ -7,7 +7,7 @@ export const UserModel = new mongoose.Schema({
     name: {type: String},
     surName: {type: String},
     patronymic: {type: String},
-    dateOfBirth: {type: Date},
+    dateOfBirth: {type: String},
     balance: {type: Number, default: 0},
     verifyCode: {type: String, required: true},
     isVerify: {type: Boolean, default: false}
@@ -21,7 +21,7 @@ export interface User extends mongoose.Document {
     name: string;
     surName: string;
     patronymic: string;
-    dateOfBirth: Date;
+    dateOfBirth: String;
     verifyCode: string;
     isVerify: boolean;
 }

@@ -9,12 +9,23 @@ import {JwtModule} from "@nestjs/jwt";
 import {AccessStrategy} from "./strategies/access.strategy";
 import {RefreshStrategy} from "./strategies/refresh.strategy";
 import {TokenModel} from "./models/token.model";
+import {TwilioModule} from "nestjs-twilio";
+import {AdminModel} from "./models/admin.model";
 
 @Module({
   imports: [
       JwtModule.register({}),
+      TwilioModule.forRootAsync({
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => ({
+              accountSid: configService.get('TWILIO_ACCOUNT_SID'),
+              authToken: configService.get('TWILIO_AUTH_TOKEN'),
+          }),
+          inject: [ConfigService],
+      }),
       MongooseModule.forFeature([{name: 'User', schema: UserModel}]),
       MongooseModule.forFeature([{name: 'Token', schema: TokenModel}]),
+      MongooseModule.forFeature([{name: 'Admin', schema: AdminModel}]),
       MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],

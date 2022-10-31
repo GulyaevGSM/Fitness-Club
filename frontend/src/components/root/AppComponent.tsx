@@ -17,7 +17,7 @@ const AppComponent: NextComponentType<AppContext, AppInitialProps, AppLayoutProp
         }
 
         fetchUser()
-    }, [dispatch])
+    }, [])
 
     const getLayout = Component.getLayout || ((page: ReactNode) => page)
 
@@ -29,22 +29,23 @@ const AppComponent: NextComponentType<AppContext, AppInitialProps, AppLayoutProp
         )
     }
 
+    if(loading) {
+        return (
+            <PreloaderOverflow>
+                <Triangle
+                    height="100"
+                    width="100"
+                    color="#968057"
+                    ariaLabel="triangle-loading"
+                    wrapperStyle={{}}
+                    visible={true}
+                />
+            </PreloaderOverflow>
+        )
+    }
+
     return (
         <AppLayout>
-            {
-                loading && (
-                    <PreloaderOverflow>
-                        <Triangle
-                            height="100"
-                            width="100"
-                            color="#968057"
-                            ariaLabel="triangle-loading"
-                            wrapperStyle={{}}
-                            visible={true}
-                        />
-                    </PreloaderOverflow>
-                )
-            }
             <Component {...pageProps}/>
         </AppLayout>
     )

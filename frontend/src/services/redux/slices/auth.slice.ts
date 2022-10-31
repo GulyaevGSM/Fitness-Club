@@ -1,6 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {axiosInstance} from "../../requests/instance/axios.instance";
 import {IAuthState, IRegisterAuthData, TAuthLogin, TAuthRegister, TAuthVerifyCode} from "../../types/auth.type";
+import {addUser} from "./user.slice";
 
 const initialState: IAuthState = {
     loading: false,
@@ -23,10 +24,11 @@ export const authRegister = createAsyncThunk(
 
 export const authVerify = createAsyncThunk(
     'auth/authVerify',
-    async function(data: TAuthVerifyCode, {rejectWithValue}) {
+    async function(data: TAuthVerifyCode, {rejectWithValue, dispatch}) {
         try {
             const res = await axiosInstance.post<TAuthVerifyCode>('/api/user/verify', data)
 
+            await dispatch(addUser(res.data))
             console.log('Verify Request Data => ', res)
             return res.data
         } catch (e) {
@@ -42,6 +44,22 @@ export const authCheck = createAsyncThunk(
             const res = await axiosInstance.get('/api/user/check')
 
             console.log('CheckUser Request Data => ', res)
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e)
+        }
+    }
+)
+
+export const authAdmin = createAsyncThunk(
+    'auth/authAdmin',
+    async function(adminCode: string, {rejectWithValue}) {
+        try {
+            const res = await axiosInstance.post('/api/user/logadmin', {
+                adminCode
+            })
+
+            console.log('AuthAdmin Request Data => ', res)
             return res.data
         } catch (e) {
             return rejectWithValue(e)
@@ -65,6 +83,18 @@ const AuthSlice = createSlice({
             state.error = null
         },
         [authRegister.rejected.type]: (state, action) => {
+            state.loading = false
+            state.error = true
+        },
+        [authAdmin.pending.type]: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        [authAdmin.fulfilled.type]: (state) => {
+            state.loading = false
+            state.error = null
+        },
+        [authAdmin.rejected.type]: (state, action) => {
             state.loading = false
             state.error = true
         },

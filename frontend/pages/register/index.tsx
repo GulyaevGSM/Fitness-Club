@@ -20,7 +20,6 @@ import {useRouter} from "next/router";
 import {useForm} from "react-hook-form";
 import {Toaster} from "react-hot-toast";
 import {authNotify} from "../../src/components/toasts/auth.notify";
-import {verifyUserRequest} from "../../src/services/requests/auth.request";
 import {completeIcon, errorIcon, processIcon} from "../../src/utils/icons";
 import {useAppDispatch, useAppSelector} from "../../src/services/redux/hooks";
 import {authRegister, authVerify} from "../../src/services/redux/slices/auth.slice";
@@ -121,7 +120,6 @@ const Register = () => {
                 if(!isVerifyCode) return
 
                 if(isVerifyCode.trim()) {
-                    // await verifyUserRequest({verifyCode: isVerifyCode.trim()})
                     const resAction = await dispatch(authVerify({verifyCode: isVerifyCode.trim()}))
                     unwrapResult(resAction)
                     authNotify(completeIcon, 'Вы успешно подтвердили аккаунт')
@@ -263,7 +261,9 @@ const Register = () => {
                 </AcceptInfo>
                 <Button
                     onClick={handleSubmit(registerHandler)}
-                >Зарегистрироваться</Button>
+                >
+                    Зарегистрироваться
+                </Button>
                 <ToLoginPage>Если у вас уже есть аккаунт, вы можете <span onClick={redirectHandler}>войти в личный кабинет</span></ToLoginPage>
             </RegisterForm>
         </RegisterTemplate>

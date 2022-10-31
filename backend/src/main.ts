@@ -22,7 +22,7 @@ async function bootstrap() {
         secret: process.env.SESSION_SECRET,
         saveUninitialized: false,
         resave: false,
-        name: 'CHAT_APP_SESSION_ID',
+        name: 'FITNESS_CLUB_APP',
         cookie: {
           maxAge: 86400000, // cookie expires 1 day later
         }

@@ -1,8 +1,13 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {IUser} from "../../types/user.type";
+import {IChangePassword, IUser} from "../../types/user.type";
 import {axiosInstance} from "../../requests/instance/axios.instance";
-import {IRegisterAuthData, TAuthLogin} from "../../types/auth.type";
-import {dispatch} from "react-hot-toast/src/core/store";
+import {IRegisterAuthData, TAuthLogin, TAuthVerifyCode} from "../../types/auth.type";
+
+const initialState: IUser  = {
+    user: null,
+    loading: false,
+    error: null
+}
 
 export const checkToken = createAsyncThunk(
     'user/checkToken',
@@ -10,6 +15,59 @@ export const checkToken = createAsyncThunk(
         try {
             const res = await axiosInstance.get('/api/user/check')
             dispatch(addUser(res.data))
+
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e)
+        }
+    }
+)
+
+export const checkData = createAsyncThunk(
+    'user/checkData',
+    async function(aToken: string, {dispatch, rejectWithValue}) {
+        try {
+            const res = await axiosInstance.get('/api/user/checkdata', {
+                headers: {
+                    Authorization: `Bearer ${aToken}`
+                }
+            })
+            console.log(res)
+
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e)
+        }
+    }
+)
+
+export const userVerify = createAsyncThunk(
+    'user/userVerify',
+    async function(data: TAuthVerifyCode, {rejectWithValue, dispatch}) {
+        try {
+            const res = await axiosInstance.post<TAuthVerifyCode>('/api/user/verify', data)
+
+            console.log('Verify Request Data => ', res)
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e)
+        }
+    }
+)
+
+export const changePassword = createAsyncThunk(
+    'user/changePassword',
+    async function({oldPassword, password, aToken}: IChangePassword , {dispatch, rejectWithValue}) {
+        try {
+            const res = await axiosInstance.post('/api/user/changepassword', {
+                oldPassword,
+                password
+            },{
+                headers: {
+                    Authorization: `Bearer ${aToken}`
+                }
+            })
+            console.log(res)
 
             return res.data
         } catch (e) {
@@ -48,12 +106,6 @@ export const logoutUser = createAsyncThunk(
     }
 )
 
-const initialState: IUser  = {
-    user: null,
-    loading: false,
-    error: null
-}
-
 const UserSlice = createSlice({
     name: 'user',
     initialState,
@@ -75,6 +127,42 @@ const UserSlice = createSlice({
             state.error = null
         },
         [checkToken.rejected.type]: (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        },
+        [userVerify.pending.type]: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        [userVerify.fulfilled.type]: (state) => {
+            state.loading = false
+            state.error = null
+        },
+        [userVerify.rejected.type]: (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        },
+        [changePassword.pending.type]: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        [changePassword.fulfilled.type]: (state) => {
+            state.loading = false
+            state.error = null
+        },
+        [changePassword.rejected.type]: (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        },
+        [checkData.pending.type]: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        [checkData.fulfilled.type]: (state) => {
+            state.loading = false
+            state.error = null
+        },
+        [checkData.rejected.type]: (state, action) => {
             state.loading = false
             state.error = action.payload
         },

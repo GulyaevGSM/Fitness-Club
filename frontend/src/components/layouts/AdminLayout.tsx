@@ -1,10 +1,14 @@
 import React from 'react';
+import AdminHeader from "../common/admin-header/AdminHeader";
 
-const AdminLayout = () => {
+const AdminLayout = ({children}: any) => {
     return (
-        <div>
-            AdminLayout
+        <>
+        <AdminHeader />
+        <div className='content'>
+            {children}
         </div>
+        </>
     );
 };
 
