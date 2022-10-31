@@ -9,6 +9,7 @@ import {ProfileForm, ProfileTemplate } from './styles/profile.style';
 import {Avatar, Button, Input} from "@chakra-ui/react";
 import {Balance, BalanceBlock, BalanceTemplate, BalanceTitle } from './styles/balance.style';
 import {useRouter} from "next/router";
+import Head from "next/head";
 
 const Profile = ({data, success}: IDataUser) => {
     const router = useRouter()
@@ -60,6 +61,10 @@ const Profile = ({data, success}: IDataUser) => {
 
     return (
         <ProfileTemplate>
+            <Head>
+                <title>Профиль</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            </Head>
             {
                 !success ? (
                     <ProfileForm>
@@ -117,7 +122,8 @@ Profile.getLayout = function getLayout(page: ReactNode) {
 
 export const getServerSideProps = async (ctx: any) => {
     try {
-        const accessToken = ctx.req.headers.cookie.split('=')[1];
+        const accessToken = ctx.req.headers.cookie.split('=')[1].split(';')[0]
+        console.log(accessToken)
 
             const checkUserData = await axiosInstance.get<ICheckData>('/api/user/checkdata', {
                 headers: {

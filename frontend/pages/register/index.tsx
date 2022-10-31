@@ -25,6 +25,7 @@ import {useAppDispatch, useAppSelector} from "../../src/services/redux/hooks";
 import {authRegister, authVerify} from "../../src/services/redux/slices/auth.slice";
 import { Triangle } from  'react-loader-spinner'
 import {unwrapResult} from "@reduxjs/toolkit";
+import Head from "next/head";
 
 const Register = () => {
     const router = useRouter()
@@ -135,6 +136,10 @@ const Register = () => {
 
     return (
         <RegisterTemplate>
+            <Head>
+                <title>Регистрация</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            </Head>
             {
                 loading && (
                     <PreloaderOverflow>

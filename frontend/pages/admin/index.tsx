@@ -1,14 +1,15 @@
 import React, {ReactNode, useEffect} from 'react';
 import AdminLayout from "../../src/components/layouts/AdminLayout";
 import { AdminTempalate } from './styles/admin.style';
-import {Input} from "@chakra-ui/react";
-import {useRouter} from "next/router";
-import {axiosInstance} from "../../src/services/requests/instance/axios.instance";
+import Head from "next/head";
 
-const Admin = ({adminCookie}: any) => {
+const Admin = () => {
     return (
         <AdminTempalate>
-
+            <Head>
+                <title>Админ Панель</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            </Head>
         </AdminTempalate>
     );
 };
@@ -26,7 +27,7 @@ Admin.getLayout = function getLayout(page: ReactNode) {
 export const getServerSideProps = async (ctx: any) => {
     try {
         const cookies = ctx.req.headers.cookie
-        const adminCookie = cookies.includes('admin')
+        const adminCookie = cookies.includes('adminCookie=true')
 
         if(!adminCookie) {
             return {

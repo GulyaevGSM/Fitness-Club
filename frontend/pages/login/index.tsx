@@ -23,6 +23,7 @@ import {useAppDispatch, useAppSelector} from "../../src/services/redux/hooks";
 import {PreloaderOverflow} from "../register/styles/register.style";
 import {Triangle} from "react-loader-spinner";
 import {addUser, userLogin} from "../../src/services/redux/slices/user.slice";
+import Head from "next/head";
 
 const Login = () => {
     const [form, setForm] = useState<any>({
@@ -129,7 +130,10 @@ const Login = () => {
 
     return (
         <LoginTemplate>
-
+            <Head>
+                <title>Вход в систему</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            </Head>
             {
                 loading && (
                     <PreloaderOverflow>

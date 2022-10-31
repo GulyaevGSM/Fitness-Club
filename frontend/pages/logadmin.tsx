@@ -9,6 +9,7 @@ import {useRouter} from "next/router";
 import {authNotify} from "../src/components/toasts/auth.notify";
 import {errorIcon} from "../src/utils/icons";
 import {Toaster} from "react-hot-toast";
+import Head from "next/head";
 
 export const LogAdminTemplate = styled.div`
   display: flex;
@@ -64,6 +65,10 @@ const LogAdmin = () => {
 
     return (
         <LogAdminTemplate>
+            <Head>
+                <title>Вход в Админ Панель</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            </Head>
             <Toaster
                 position="bottom-center"
                 reverseOrder={false}

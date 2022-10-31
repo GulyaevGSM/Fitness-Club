@@ -216,7 +216,7 @@ Details.getLayout = function getLayout(page: ReactNode) {
 
 export const getServerSideProps = async (ctx: any) => {
     try {
-        const accessToken = ctx.req.headers.cookie.split('=')[1]
+        const accessToken = ctx.req.headers.cookie.split('=')[1].split(';')[0]
 
         const res = await axiosInstance.get('/api/user/getuser', {
             headers: {
