@@ -29,6 +29,16 @@ export const getServerSideProps = async (ctx: any) => {
         const cookies = ctx.req.headers.cookie
         const adminCookie = cookies.includes('adminCookie=true')
 
+        if(adminCookie) {
+            return {
+                redirect: {
+                    permanent: false,
+                    destination: "/admin/users",
+                },
+                props:{},
+            };
+        }
+
         if(!adminCookie) {
             return {
                 redirect: {

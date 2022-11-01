@@ -6,7 +6,7 @@ import {Triangle} from "react-loader-spinner"
 import {PreloaderOverflow} from "../register/styles/register.style";
 import {ICheckData, IDataUser} from "../../src/services/types/user.type";
 import {ProfileForm, ProfileTemplate } from './styles/profile.style';
-import {Avatar, Button, Input} from "@chakra-ui/react";
+import {Avatar, Button, Input, Stat, StatNumber} from "@chakra-ui/react";
 import {Balance, BalanceBlock, BalanceTemplate, BalanceTitle } from './styles/balance.style';
 import {useRouter} from "next/router";
 import Head from "next/head";
@@ -100,7 +100,11 @@ const Profile = ({data, success}: IDataUser) => {
                             <BalanceTitle>
                                 Лицевой счет: {data.surName + ' ' + data.name}
                             </BalanceTitle>
-                            <Balance>{data.balance} RUB</Balance>
+                            <Balance>
+                                <>
+                                    <>{data.balance} RUB</>
+                                </>
+                            </Balance>
                             <Button>Пополнить</Button>
                         </BalanceBlock>
                     </BalanceTemplate>

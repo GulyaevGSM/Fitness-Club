@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res, UseGuards} from '@nestjs/common';
 import { UserService } from './user.service';
 import {RegisterUserDto} from "./dtos/register-user.dto";
 import {LoginUserDto} from "./dtos/login-user.dto";
@@ -9,6 +9,8 @@ import {GetCurrentUserId} from "./common/decorators/get-current-user-id.decorato
 import {ConfirmDataDto} from "./dtos/confirm-data.dto";
 import {ChangePasswordDto} from "./dtos/change-password.dto";
 import {AdminCodeDto} from "./dtos/admin-code.dto";
+import {GetUserDto} from "./dtos/get-user.dto";
+import {EditUserDto} from "./dtos/edit-user.dto";
 
 @Controller('user')
 export class UserController {
@@ -78,7 +80,21 @@ export class UserController {
     return await this.userService.logAdmin(response, adminCodeDTO)
   }
 
-  // `@UseGuards(AuthGuard('jwt-access'))`
+  @Get('getusers')
+  async getUsers() {
+    return await this.userService.getUsers()
+  }
+
+  @Post('getadminuser')
+  async getAdminUser(@Body() getUserDTO: GetUserDto) {
+    return await this.userService.getAdminUser(getUserDTO)
+  }
+
+  @Post('edituser/:userID')
+  async editUser(@Body() editUserDTO: EditUserDto, @Param('userID') userID: string) {
+    return await this.userService.editUser(editUserDTO, userID)
+  }
+
   @Get('test')
   async test() {
     return await this.userService.test()

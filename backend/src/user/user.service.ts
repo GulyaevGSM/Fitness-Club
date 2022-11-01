@@ -18,6 +18,8 @@ import {TwilioService} from "nestjs-twilio";
 import {Admin} from "./models/admin.model";
 import {AdminCodeDto} from "./dtos/admin-code.dto";
 import {find} from "rxjs";
+import {GetUserDto} from "./dtos/get-user.dto";
+import {EditUserDto} from "./dtos/edit-user.dto";
 
 @Injectable()
 export class UserService {
@@ -274,6 +276,34 @@ export class UserService {
         await response.cookie('adminCookie', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true })
 
         return {admin: findAdminCode}
+    }
+
+    async getUsers() {
+        return this.userModel.find()
+    }
+
+    async getAdminUser(getUserDTO: GetUserDto) {
+        const {userID} = getUserDTO
+        const user = await this.userModel.findById(userID)
+
+        if(!user) {
+            throw new BadRequestException('Недействительный пользователь')
+        }
+
+        return user
+    }
+
+    async editUser(editUserDTO: EditUserDto, userID: string) {
+        const user = await this.userModel.findByIdAndUpdate(userID, {
+            $set: {
+                ...editUserDTO
+            }
+        })
+        await user.save()
+
+        if(!user) new BadRequestException('Ошибка изменения пользователя')
+
+        return user
     }
 
     async test() {
