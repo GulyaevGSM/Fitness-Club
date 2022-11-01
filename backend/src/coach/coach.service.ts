@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Get, Injectable} from '@nestjs/common';
 import {Coach} from "./models/coach.model";
 import {Model} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
@@ -9,5 +9,11 @@ export class CoachService {
         @InjectModel('Coach') private readonly coachModel: Model<Coach>
     ) {}
 
+    async createCoach() {
 
+    }
+
+    async getCoaches() {
+
+    }
 }
