@@ -4,7 +4,7 @@ export const ServicesModel = new mongoose.Schema({
     serviceName: {type: String, required: true, unique: true},
     price: {type: Number, required: true},
     coach: {type: String},
-    time: {type: String},
+    date: {type: String},
     category: {type: String},
     amount: {type: Number},
     description: {type: String}

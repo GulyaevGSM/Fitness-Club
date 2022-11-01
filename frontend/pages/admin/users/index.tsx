@@ -6,6 +6,7 @@ import {axiosInstance} from "../../../src/services/requests/instance/axios.insta
 import styled from "styled-components";
 import {EditIcon} from "@chakra-ui/icons";
 import Link from "next/link";
+import { Heading } from '@chakra-ui/react';
 
 interface IUsers {
     users: []
@@ -61,6 +62,9 @@ const Users = ({users}: IUsers) => {
                 <title>Админ Панель</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
+            <Heading as='h2' size='xl'>
+                Клиенты
+            </Heading>
 
             {
                 users.map((user: TUser, index) => {

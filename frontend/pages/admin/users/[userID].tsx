@@ -30,9 +30,6 @@ const UserID = ({user}: ICurrentUser) => {
         balance: user.balance,
         dateOfBirth: user.dateOfBirth
     })
-
-    const dispatch = useAppDispatch()
-
     const changeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setForm({
             ...form,
@@ -42,7 +39,13 @@ const UserID = ({user}: ICurrentUser) => {
 
     const clickHandler = async () => {
         try {
-            const res = await axiosInstance.post(`/api/user/edituser/${user._id}`, {...form})
+            const res = await axiosInstance.post(`/api/user/edituser/${user._id}`, {
+                surName: form.surName.trim(),
+                name: form.name.trim(),
+                patronymic: form.patronymic.trim(),
+                balance: form.balance,
+                dateOfBirth: form.dateOfBirth.trim()
+            })
             console.log(res.data)
         } catch (e) {
             console.log(e)
