@@ -81,6 +81,8 @@ export class UserService {
                 `
         })
 
+
+
         return {
             message: 'Сообщение для активации вашего личного кабинета было отправлено на вашу почту',
             user: newUser
@@ -109,6 +111,7 @@ export class UserService {
 
             await response.cookie('accessToken', tokens.accessToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
             //expiresIn = 1 month
+            await response.clearCookie('adminCookie')
 
             return {
                 message: 'Вы вошли в личный кабинет',
@@ -139,19 +142,37 @@ export class UserService {
     }
 
     async checkToken(request: Request, response: Response) {
-        const {accessToken} = request.cookies
-        if(accessToken) {
-            const decode = await this.jwtService.verify(accessToken, {
-                secret: this.configService.get('ACCESS_SECRET')
+        try {
+            const {accessToken} = request.cookies
+
+            const jwtVerify = await this.jwtService.verify(accessToken, {
+                secret: this.configService.get<string>('ACCESS_SECRET')
             })
 
+            if(!jwtVerify) {
+                return response.clearCookie('accessToken')
+            }
+
             return {
-                user: decode,
+                user: jwtVerify,
                 accessToken
             }
+        } catch (e) {
+            response.clearCookie('accessToken')
         }
 
-        return
+        // if(accessToken) {
+        //     const decode = await this.jwtService.verify(accessToken, {
+        //         secret: this.configService.get('ACCESS_SECRET')
+        //     })
+        //
+        //     return {
+        //         user: decode,
+        //         accessToken
+        //     }
+        // } else {
+        //     response.clearCookie('accessToken')
+        // }
     }
 
     async checkUserData(userID: string) {
@@ -245,7 +266,7 @@ export class UserService {
         }
     }
 
-    async admin() {
+    async admin(response: Response) {
         const adminCode = await randomstring.generate(5)
         const sendSMS = await this.twilioService.client.messages.create({
             body: `Код для входа в админку: ${adminCode}`,
@@ -253,11 +274,14 @@ export class UserService {
             to: '+79788768325',
         })
 
+        await response.clearCookie('accessToken')
+
         await this.adminModel.deleteMany()
 
         if(!sendSMS) throw new BadRequestException('Ошибка админ запроса')
 
         const adminModel = await this.adminModel.create({adminCode})
+
 
         return {
             admin: adminModel,
@@ -274,6 +298,7 @@ export class UserService {
         }
 
         await response.cookie('adminCookie', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true })
+        await response.clearCookie('accessToken')
 
         return {admin: findAdminCode}
     }

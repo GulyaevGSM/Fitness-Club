@@ -105,22 +105,20 @@ LogAdmin.getLayout = function getLayout(page: ReactNode) {
 
 export const getServerSideProps = async (ctx: any) => {
     try {
-        const cookies = ctx.req.headers.cookie
-        const adminCookie = cookies.includes('admin')
-
-        if(adminCookie) {
-            return {
-                redirect: {
-                    permanent: false,
-                    destination: "/admin",
-                },
-                props:{},
-            };
-        }
+        // const cookies = ctx.req.headers.cookie
+        // const adminCookie = cookies.includes('admin')
+        //
+        // if(adminCookie) {
+        //     return {
+        //         redirect: {
+        //             permanent: false,
+        //             destination: "/admin",
+        //         },
+        //         props:{},
+        //     };
+        // }
 
         const res = await axiosInstance.get('/api/user/admin')
-        console.log(res)
-
         return {
             props: {}
         }

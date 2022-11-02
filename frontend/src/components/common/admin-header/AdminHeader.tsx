@@ -8,7 +8,7 @@ const AdminHeader = () => {
             <Link href='/admin/users'>
                 <div>Пользователи</div>
             </Link>
-            <Link href='/admin/blog'>
+            <Link href='/admin/news'>
                 <div>Блог</div>
             </Link>
             <Link href='/admin/coaches'>

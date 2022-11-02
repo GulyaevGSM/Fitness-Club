@@ -26,7 +26,7 @@ export class UserController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() registerUserDTO: RegisterUserDto) {
+  async register(@Res({passthrough: true}) response: Response, @Body() registerUserDTO: RegisterUserDto) {
     return await this.userService.register(registerUserDTO)
   }
 
@@ -71,8 +71,8 @@ export class UserController {
   }
 
   @Get('admin')
-  async admin(@Res({passthrough: true}) response) {
-    return await this.userService.admin()
+  async admin(@Res({passthrough: true}) response: Response) {
+    return await this.userService.admin(response)
   }
 
   @Post('logadmin')

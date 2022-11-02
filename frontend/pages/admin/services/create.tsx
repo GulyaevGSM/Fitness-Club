@@ -110,7 +110,7 @@ const CreateService = () => {
                 onChange={changeHandler}
                 placeholder='Дата занятия'
                 name='date'
-                type='date'
+                type='datetime-local'
             />
             <Input
                 style={{

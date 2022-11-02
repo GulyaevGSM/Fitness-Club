@@ -50,7 +50,7 @@ const ServiceDetail = ({service}: IService) => {
                 amount: form.amount,
                 description: form.description.trim()
             })
-            router.push('/admin/services')
+            await router.push('/admin/services')
         } catch (e) {
             console.log(e)
         }
@@ -77,7 +77,7 @@ const ServiceDetail = ({service}: IService) => {
                 name='coach'
             />
             <Input
-                type='date'
+                type='datetime-local'
                 onChange={changeHandler}
                 value={form.date}
                 placeholder={service.date}

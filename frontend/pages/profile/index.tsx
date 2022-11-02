@@ -126,8 +126,7 @@ Profile.getLayout = function getLayout(page: ReactNode) {
 
 export const getServerSideProps = async (ctx: any) => {
     try {
-        const accessToken = ctx.req.headers.cookie.split('=')[1].split(';')[0]
-        console.log(accessToken)
+        const accessToken = ctx.req.headers.cookie.split('=')[1]
 
             const checkUserData = await axiosInstance.get<ICheckData>('/api/user/checkdata', {
                 headers: {
@@ -139,7 +138,6 @@ export const getServerSideProps = async (ctx: any) => {
                     Authorization: `Bearer ${accessToken}`
                 }
             })
-
             return {
                 props: {
                     data: res.data,

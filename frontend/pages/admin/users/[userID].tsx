@@ -3,6 +3,7 @@ import AdminLayout from "../../../src/components/layouts/AdminLayout";
 import {axiosInstance} from "../../../src/services/requests/instance/axios.instance";
 import {Button, Input} from "@chakra-ui/react";
 import {useAppDispatch} from "../../../src/services/redux/hooks";
+import {useRouter} from "next/router";
 
 type TUser = {
     _id: string;
@@ -23,6 +24,8 @@ interface ICurrentUser {
 }
 
 const UserID = ({user}: ICurrentUser) => {
+    const router = useRouter()
+
     const [form, setForm] = useState({
         surName: user.surName,
         name: user.name,
@@ -47,6 +50,7 @@ const UserID = ({user}: ICurrentUser) => {
                 dateOfBirth: form.dateOfBirth.trim()
             })
             console.log(res.data)
+            await router.push('/admin/users')
         } catch (e) {
             console.log(e)
         }

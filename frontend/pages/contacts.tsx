@@ -9,3 +9,9 @@ const Contacts = () => {
 };
 
 export default Contacts;
+
+// export const getServerSideProps = async (ctx: any) => {
+//     const tokens = ctx.req.headers.cookie
+//     console.log(tokens)
+//
+// }

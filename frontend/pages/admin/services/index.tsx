@@ -1,12 +1,15 @@
 import React, {ReactNode} from 'react';
 import AdminLayout from "../../../src/components/layouts/AdminLayout";
 import Head from "next/head";
-import {Button, Heading} from "@chakra-ui/react";
+import {Button, Heading, Stat, StatHelpText, StatLabel, StatNumber} from "@chakra-ui/react";
 import {useRouter} from "next/router";
 import {axiosInstance} from "../../../src/services/requests/instance/axios.instance";
 import styled from "styled-components";
 import {EditIcon} from "@chakra-ui/icons";
 import Link from "next/link";
+import moment from "moment";
+import 'moment/locale/ru'  // without this line it didn't work
+moment.locale('ru')
 
 const ServiceBlock = styled.div`
   margin: 30px 0;
@@ -26,7 +29,7 @@ const ServiceBlock = styled.div`
   }
 `
 
-const Edit = styled.span`
+export const Edit = styled.span`
   cursor: pointer;
   display: inline-block;
 
@@ -82,7 +85,11 @@ const Services = ({services}: IServices) => {
                         </div>
                         <div>
                             <div>Цена</div>
-                            <div>{service.price}</div>
+                            <div>
+                                <Stat>
+                                    <StatNumber>₽ {service.price}</StatNumber>
+                                </Stat>
+                            </div>
                         </div>
                         <div>
                             <div>Тренер</div>
@@ -90,7 +97,7 @@ const Services = ({services}: IServices) => {
                         </div>
                         <div>
                             <div>Дата занятия</div>
-                            <div>{service.date}</div>
+                            <div>{moment(service.date).format('lll')}</div>
                         </div>
                         <div>
                             <div>Категория</div>
