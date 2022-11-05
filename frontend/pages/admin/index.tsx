@@ -24,35 +24,13 @@ Admin.getLayout = function getLayout(page: ReactNode) {
     )
 }
 
-export const getServerSideProps = async (ctx: any) => {
-    try {
-        const cookies = ctx.req.headers.cookie
-        const adminCookie = cookies.includes('adminCookie=true')
-
-        if(adminCookie) {
-            return {
-                redirect: {
-                    permanent: false,
-                    destination: "/admin/users",
-                },
-                props:{},
-            };
-        }
-
-        if(!adminCookie) {
-            return {
-                redirect: {
-                    permanent: false,
-                    destination: "/logadmin",
-                },
-                props:{},
-            };
-        }
-
-        return {
-            props: {}
-        }
-    } catch (e) {
-        console.log(e)
-    }
-}
+// export const getServerSideProps = async () => {
+//
+//     return {
+//         redirect: {
+//             permanent: false,
+//             destination: "/logadmin",
+//         },
+//         props:{},
+//     };
+// }

@@ -1,4 +1,4 @@
-import React, {ChangeEvent, ReactNode, useState} from 'react';
+import React, {ChangeEvent, ReactNode, useEffect, useState} from 'react';
 import styled from "styled-components";
 import {Button, Input} from "@chakra-ui/react";
 import {axiosInstance} from "../src/services/requests/instance/axios.instance";
@@ -10,6 +10,7 @@ import {authNotify} from "../src/components/toasts/auth.notify";
 import {errorIcon} from "../src/utils/icons";
 import {Toaster} from "react-hot-toast";
 import Head from "next/head";
+import {addAdmin} from "../src/services/redux/slices/admin.slice";
 
 export const LogAdminTemplate = styled.div`
   display: flex;
@@ -43,19 +44,24 @@ export const LogAdminTitle = styled.div`
   font-weight: bold;
 `
 
-const LogAdmin = () => {
-    const [adminCode, setAdminCode] = useState('')
+const LogAdmin = ({cookies}: any) => {
+    const [admin_login, setAdminLogin] = useState('')
+    const [admin_password, setAdminPassword] = useState('')
     const dispatch = useAppDispatch()
     const {loading, error} = useAppSelector(state => state.AuthReducer)
     const router = useRouter()
 
     const adminUserAuth = async () => {
-        try {
-            const resAction = await dispatch(authAdmin(adminCode))
-            unwrapResult(resAction)
-            await router.push('/admin')
-       } catch (e: any) {
-            authNotify(errorIcon, e.response.data.message)
+        if(admin_login && admin_password !== '') {
+            if(
+            admin_login === process.env.NEXT_PUBLIC_LOGIN_ADMIN
+            &&
+            admin_password === process.env.NEXT_PUBLIC_PASSWORD_ADMIN
+            ) {
+                await router.push('/admin/users')
+            } else {
+                authNotify(errorIcon, 'Неверные данные')
+            }
         }
     }
 
@@ -77,12 +83,22 @@ const LogAdmin = () => {
                     Вход в Админ Панель
                 </LogAdminTitle>
                 <Input
-                    placeholder='Введите код для входа'
+                    type='password'
+                    placeholder='Введите логин'
+                    style={{
+                        margin: '10px 0'
+                    }}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setAdminLogin(e.target.value)}
+                    value={admin_login}
+                />
+            <Input
+                type='password'
+                placeholder='Введите пароль'
                     style={{
                         margin: '50px 0'
                     }}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setAdminCode(e.target.value)}
-                    value={adminCode}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setAdminPassword(e.target.value)}
+                    value={admin_password}
                 />
                 <Button
                     onClick={adminUserAuth}
@@ -101,29 +117,5 @@ LogAdmin.getLayout = function getLayout(page: ReactNode) {
             {page}
         </>
     )
-}
-
-export const getServerSideProps = async (ctx: any) => {
-    try {
-        // const cookies = ctx.req.headers.cookie
-        // const adminCookie = cookies.includes('admin')
-        //
-        // if(adminCookie) {
-        //     return {
-        //         redirect: {
-        //             permanent: false,
-        //             destination: "/admin",
-        //         },
-        //         props:{},
-        //     };
-        // }
-
-        const res = await axiosInstance.get('/api/user/admin')
-        return {
-            props: {}
-        }
-    } catch (e) {
-        console.log(e)
-    }
 }
 

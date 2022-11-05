@@ -1,15 +1,24 @@
 import {NextComponentType} from "next";
 import {AppContext, AppInitialProps, AppLayoutProps} from "next/app";
-import React, {ReactNode, useEffect} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import AppLayout from "../layouts/AppLayout";
 import {useAppDispatch, useAppSelector} from "../../services/redux/hooks";
 import {checkToken} from "../../services/redux/slices/user.slice";
 import {Triangle} from "react-loader-spinner";
 import {PreloaderOverflow} from "../../../pages/register/styles/register.style";
+import {useRouter} from "next/router";
 
 const AppComponent: NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = ({Component, pageProps}: AppLayoutProps) => {
     const {loading, error} = useAppSelector(state => state.UserReducer)
+    const {admin} = useAppSelector(state => state.AdminReducer)
     const dispatch = useAppDispatch()
+    const router = useRouter()
+
+    useEffect(() => {
+        if(!admin && router.pathname.includes('/admin')) {
+            router.push('/logadmin')
+        }
+    }, [])
 
     useEffect(() => {
         const fetchUser = async () => {
