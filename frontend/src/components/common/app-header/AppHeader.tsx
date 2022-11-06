@@ -66,7 +66,11 @@ const AppHeader = () => {
                             icon={<HamburgerIcon />}
                             variant='outline'
                         />
-                        <MenuList>
+                        <MenuList
+                            style={{
+                                zIndex: 1000,
+                            }}
+                        >
                             <Link href='/team'>
                                 <MenuItem icon={<IoMdPerson />}>
                                     Наш персонал

@@ -16,7 +16,6 @@ export const UpperHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 35px;
 
   input {
     width: 330px;
