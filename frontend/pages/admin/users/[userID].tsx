@@ -4,6 +4,7 @@ import {axiosInstance} from "../../../src/services/requests/instance/axios.insta
 import {Button, Input} from "@chakra-ui/react";
 import {useAppDispatch} from "../../../src/services/redux/hooks";
 import {useRouter} from "next/router";
+import {useForm} from "react-hook-form";
 
 type TUser = {
     _id: string;
@@ -25,6 +26,14 @@ interface ICurrentUser {
 
 const UserID = ({user}: ICurrentUser) => {
     const router = useRouter()
+
+    const {
+        handleSubmit,
+        register,
+        formState: {errors}
+    } = useForm({
+        mode: 'all'
+    })
 
     const [form, setForm] = useState({
         surName: user.surName,
@@ -59,30 +68,60 @@ const UserID = ({user}: ICurrentUser) => {
     return (
         <div>
             <Input
+                style={{
+                    background: errors.surName ? '#fdd3ce' : '#fff'
+                }}
+                {...register('surName', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 placeholder={user.surName}
                 value={form.surName}
                 name='surName'
             />
             <Input
+                style={{
+                    background: errors.name ? '#fdd3ce' : '#fff'
+                }}
+                {...register('name', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 placeholder={user.name}
                 value={form.name}
                 name='name'
             />
             <Input
+                style={{
+                    background: errors.patronymic ? '#fdd3ce' : '#fff'
+                }}
+                {...register('patronymic', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 placeholder={user.patronymic}
                 value={form.patronymic}
                 name='patronymic'
             />
             <Input
+                style={{
+                    background: errors.balance ? '#fdd3ce' : '#fff'
+                }}
+                {...register('balance', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 value={form.balance}
                 placeholder={String(user.balance)}
                 name='balance'
             />
             <Input
+                style={{
+                    background: errors.dateOfBirth ? '#fdd3ce' : '#fff'
+                }}
+                {...register('dateOfBirth', {
+                    required: true
+                })}
                 type='date'
                 onChange={changeHandler}
                 value={form.dateOfBirth}
@@ -90,7 +129,7 @@ const UserID = ({user}: ICurrentUser) => {
                 name='dateOfBirth'
             />
             <Button
-                onClick={clickHandler}
+                onClick={handleSubmit(clickHandler)}
             >Подтвердить</Button>
         </div>
     );

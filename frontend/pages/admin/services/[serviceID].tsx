@@ -3,6 +3,7 @@ import AdminLayout from "../../../src/components/layouts/AdminLayout";
 import {axiosInstance} from "../../../src/services/requests/instance/axios.instance";
 import {Button, Input} from "@chakra-ui/react";
 import {useRouter} from "next/router";
+import {useForm} from "react-hook-form";
 
 type TServiceType = {
     _id: string;
@@ -21,6 +22,14 @@ interface IService {
 
 const ServiceDetail = ({service}: IService) => {
     const router = useRouter()
+
+    const {
+        handleSubmit,
+        register,
+        formState: {errors}
+    } = useForm({
+        mode: 'all'
+    })
 
     const [form, setForm] = useState({
         serviceName: service.serviceName,
@@ -58,12 +67,24 @@ const ServiceDetail = ({service}: IService) => {
     return (
         <div>
             <Input
+                style={{
+                    background: errors.serviceName ? '#fdd3ce' : '#fff'
+                }}
+                {...register('serviceName', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 placeholder={service.serviceName}
                 value={form.serviceName}
                 name='serviceName'
             />
             <Input
+                style={{
+                    background: errors.price ? '#fdd3ce' : '#fff'
+                }}
+                {...register('price', {
+                    required: true
+                })}
                 type='number'
                 onChange={changeHandler}
                 placeholder={String(service.price)}
@@ -71,12 +92,24 @@ const ServiceDetail = ({service}: IService) => {
                 name='price'
             />
             <Input
+                style={{
+                    background: errors.coach ? '#fdd3ce' : '#fff'
+                }}
+                {...register('coach', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 placeholder={service.coach}
                 value={form.coach}
                 name='coach'
             />
             <Input
+                style={{
+                    background: errors.date ? '#fdd3ce' : '#fff'
+                }}
+                {...register('date', {
+                    required: true
+                })}
                 type='datetime-local'
                 onChange={changeHandler}
                 value={form.date}
@@ -84,12 +117,24 @@ const ServiceDetail = ({service}: IService) => {
                 name='date'
             />
             <Input
+                style={{
+                    background: errors.category ? '#fdd3ce' : '#fff'
+                }}
+                {...register('category', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 value={form.category}
                 placeholder={service.category}
                 name='category'
             />
             <Input
+                style={{
+                    background: errors.amount ? '#fdd3ce' : '#fff'
+                }}
+                {...register('amount', {
+                    required: true
+                })}
                 type='number'
                 onChange={changeHandler}
                 value={form.amount}
@@ -97,13 +142,19 @@ const ServiceDetail = ({service}: IService) => {
                 name='amount'
             />
             <Input
+                style={{
+                    background: errors.description ? '#fdd3ce' : '#fff'
+                }}
+                {...register('description', {
+                    required: true
+                })}
                 onChange={changeHandler}
                 value={form.description}
                 placeholder={service.description}
                 name='description'
             />
             <Button
-                onClick={clickHandler}
+                onClick={handleSubmit(clickHandler)}
             >Подтвердить</Button>
         </div>
     );

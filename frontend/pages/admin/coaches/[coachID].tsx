@@ -1,24 +1,22 @@
 import React, {ChangeEvent, ReactNode, useState} from 'react';
 import AdminLayout from "../../../src/components/layouts/AdminLayout";
-import CreateNews from "./create";
 import {useRouter} from "next/router";
 import {axiosInstance} from "../../../src/services/requests/instance/axios.instance";
 import {Button, Input} from "@chakra-ui/react";
 import {useForm} from "react-hook-form";
 
-type TNewsArray = {
+type TCoachArray = {
     _id: string;
-    title: string;
-    subContent: string;
-    mainContent: string;
-    image: string;
+    fullName: string;
+    age: number;
+    specialization: string;
 }
 
-interface INews {
-    news: TNewsArray
+interface ICoach {
+    coach: TCoachArray
 }
 
-const EditNews = ({news}: INews) => {
+const Coach = ({coach}: ICoach) => {
     const router = useRouter()
 
     const {
@@ -30,10 +28,9 @@ const EditNews = ({news}: INews) => {
     })
 
     const [form, setForm] = useState({
-        title: news.title,
-        subContent: news.subContent,
-        mainContent: news.mainContent,
-        image: news.image
+        fullName: coach.fullName,
+        age: coach.age,
+        specialization: coach.specialization,
     })
 
     const changeHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,15 +42,14 @@ const EditNews = ({news}: INews) => {
 
     const clickHandler = async () => {
         try {
-            const res = await axiosInstance.post(`/api/blog/edit/${news._id}`, {
-                title: form.title.trim(),
-                subContent: form.subContent.trim(),
-                mainContent: form.mainContent.trim(),
-                image: form.image
+            const res = await axiosInstance.post(`/api/coach/edit/${coach._id}`, {
+                fullName: form.fullName.trim(),
+                age: form.age,
+                specialization: form.specialization.trim(),
             })
             console.log(res)
 
-            await router.push('/admin/news')
+            await router.push('/admin/coaches')
         } catch (e) {
             console.log(e)
         }
@@ -63,45 +59,34 @@ const EditNews = ({news}: INews) => {
         <div>
             <Input
                 style={{
-                    background: errors.title ? '#fdd3ce' : '#fff'
+                    background: errors.fullName ? '#fdd3ce' : '#fff'
                 }}
-                {...register('title', {
+                {...register('fullName', {
                     required: true
                 })}
                 onChange={changeHandler}
-                placeholder={news.title}
-                value={form.title}
-                name='title'
+                placeholder={coach.fullName}
+                value={form.fullName}
+                name='fullName'
             />
             <Input
                 style={{
-                    background: errors.subContent ? '#fdd3ce' : '#fff'
+                    background: errors.age ? '#fdd3ce' : '#fff'
                 }}
-                {...register('subContent', {
+                {...register('age', {
                     required: true
                 })}
                 onChange={changeHandler}
-                placeholder={news.subContent}
-                value={form.subContent}
-                name='subContent'
-            />
-            <Input
-                style={{
-                    background: errors.mainContent ? '#fdd3ce' : '#fff'
-                }}
-                {...register('mainContent', {
-                    required: true
-                })}
-                onChange={changeHandler}
-                placeholder={news.mainContent}
-                value={form.mainContent}
-                name='mainContent'
+                placeholder={String(coach.age)}
+                value={form.age}
+                name='age'
+                type='number'
             />
             <Input
                 onChange={changeHandler}
-                value={form.image}
-                placeholder={news.image}
-                name='image'
+                placeholder={coach.specialization}
+                value={form.specialization}
+                name='specialization'
             />
             <Button
                 onClick={handleSubmit(clickHandler)}
@@ -112,9 +97,9 @@ const EditNews = ({news}: INews) => {
     );
 };
 
-export default EditNews;
+export default Coach;
 
-EditNews.getLayout = function getLayout(page: ReactNode) {
+Coach.getLayout = function getLayout(page: ReactNode) {
     return (
         <AdminLayout>
             {page}
@@ -124,13 +109,13 @@ EditNews.getLayout = function getLayout(page: ReactNode) {
 
 export const getServerSideProps  = async (ctx: any) => {
     try {
-        const {newsID} = ctx.query
-        const res = await axiosInstance.get(`/api/blog/getblog/${newsID}`)
+        const {coachID} = ctx.query
+        const res = await axiosInstance.get(`/api/coach/getcoach/${coachID}`)
         console.log(res.data)
 
         return {
             props: {
-                news: res.data
+                coach: res.data
             }
         }
     } catch (e) {
